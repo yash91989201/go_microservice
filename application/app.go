@@ -17,9 +17,10 @@ type App struct {
 
 func New() *App {
 	app := &App{
-		router: registerRoutes(),
-		rdb:    redis.NewClient(&redis.Options{}),
+		rdb: redis.NewClient(&redis.Options{}),
 	}
+
+	app.registerRoutes()
 
 	return app
 }
@@ -42,7 +43,7 @@ func (a *App) Start(ctx context.Context) error {
 		}
 	}()
 
-	fmt.Println("Starting server")
+	fmt.Println("Starting server on port:8080")
 
 	ch := make(chan error, 1)
 
@@ -63,6 +64,4 @@ func (a *App) Start(ctx context.Context) error {
 
 		return server.Shutdown(timeout)
 	}
-
-	return nil
 }

@@ -6,9 +6,10 @@ import (
 	chi "github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/yash91989201/go_microservice/handler"
+	"github.com/yash91989201/go_microservice/repository/order"
 )
 
-func registerRoutes() *chi.Mux {
+func (a *App) registerRoutes() {
 	router := chi.NewRouter()
 
 	router.Use(middleware.Logger)
@@ -17,13 +18,17 @@ func registerRoutes() *chi.Mux {
 		w.WriteHeader(http.StatusOK)
 	})
 
-	router.Route("/order", registerOrderRoutes)
+	router.Route("/order", a.registerOrderRoutes)
 
-	return router
+	a.router = router
 }
 
-func registerOrderRoutes(router chi.Router) {
-	orderHandler := &handler.Order{}
+func (a *App) registerOrderRoutes(router chi.Router) {
+	orderHandler := &handler.Order{
+		Repo: &order.RedisRepo{
+			Client: a.rdb,
+		},
+	}
 
 	router.Get("/", orderHandler.Create)
 	router.Post("/", orderHandler.List)
